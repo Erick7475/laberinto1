@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jugar Laberinto</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        #maze {
+            display: grid;
+            grid-template-columns: repeat(20, 25px);
+            grid-template-rows: repeat(20, 25px);
+            gap: 1px;
+        }
+        .cell {
+            width: 25px;
+            height: 25px;
+        }
+        .wall {
+            background-color: #000;
+        }
+        .path {
+            background-color: #fff;
+        }
+        .start {
+            background-color: #0f0;
+        }
+        .end {
+            background-color: #f00;
+        }
+        .player {
+            background-color: #00f;
+        }
+    </style>
+</head>
+<body>
+    <div id="maze"></div>
+    <script>
+        const mazeContainer = document.getElementById('maze');
+        const maze = JSON.parse(localStorage.getItem('maze'));
+        const rows = maze.length;
+        const cols = maze[0].length;
+        let player = { x: 1, y: 0 };
+
+        function renderMaze() {
+            mazeContainer.innerHTML = '';
+            for (let x = 0; x < rows; x++) {
+                for (let y = 0; y < cols; y++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    if (maze[x][y] === 0) {
+                        cell.classList.add('wall');
+                    } else {
+                        cell.classList.add('path');
+                    }
+                    if (x === 1 && y === 0) {
+                        cell.classList.add('start');
+                    }
+                    if (x === rows - 2 && y === cols - 1) {
+                        cell.classList.add('end');
+                    }
+                    if (x === player.x && y === player.y) {
+                        cell.classList.add('player');
+                    }
+                    mazeContainer.appendChild(cell);
+                }
+            }
+        }
+
+        function movePlayer(e) {
+            const directions = {
+                ArrowUp: { x: -1, y: 0 },
+                ArrowDown: { x: 1, y: 0 },
+                ArrowLeft: { x: 0, y: -1 },
+                ArrowRight: { x: 0, y: 1 }
+            };
+
+            const dir = directions[e.key];
+            if (dir) {
+                const newX = player.x + dir.x;
+                const newY = player.y + dir.y;
+                if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && maze[newX][newY] === 1) {
+                    player.x = newX;
+                    player.y = newY;
+                    renderMaze();
+                }
+            }
+
+            // Comprobar si el jugador ha llegado a la salida
+            if (player.x === rows - 2 && player.y === cols - 1) {
+                alert("¡Felicidades! Has llegado a la salida.");
+            }
+        }
+
+        renderMaze();
+        window.addEventListener('keydown', movePlayer);
+    </script>
+</body>
+</html>
